@@ -150,7 +150,7 @@ app.put('/citas/:id', (req, res) => {
     });
 });
 
-// Ruta para eliminar un usuario
+//Ruta para eliminar un usuario
 app.delete('/citas/:id', (req, res) => {
     const { id } = req.params;
 
@@ -163,3 +163,33 @@ app.delete('/citas/:id', (req, res) => {
         res.send('Cita eliminada correctamente');
     });
 });
+
+//Aca empiezo las APIs para trabajar el historial medico
+app.post('/historial', (req, res) => {
+    const { id_paciente, id_doctor, descripcion, fecha } = req.body;
+
+    const sql = 'INSERT INTO historial_medico (id_paciente, id_doctor, descripcion, fecha) VALUES (?, ?, ?, ?)';
+
+    db.query(sql, [id_paciente, id_doctor, descripcion, fecha], (err, result) => {
+        if (erro){
+            return res.status(500).send('Error al agregar entrada al historial medico');
+        }
+        res.status(201).send('Entrada al historial medico registrada con exito');
+    });
+});
+
+//Ruta para obtener el historial medico de un paciente
+// Ruta para obtener el historial médico de un paciente
+app.get('/historial/:id_paciente', (req, res) => {
+    const { id_paciente } = req.params;
+  
+    const sql = `SELECT * FROM historial_medico WHERE id_paciente = ?`;
+  
+    db.query(sql, [id_paciente], (err, results) => {
+        if (err) {
+            return res.status(500).send('Error obteniendo el historial médico');
+        }
+        res.json(results);
+    });
+});
+  
