@@ -179,7 +179,6 @@ app.post('/historial', (req, res) => {
 });
 
 //Ruta para obtener el historial medico de un paciente
-// Ruta para obtener el historial médico de un paciente
 app.get('/historial/:id_paciente', (req, res) => {
     const { id_paciente } = req.params;
   
