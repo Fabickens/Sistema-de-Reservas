@@ -136,3 +136,30 @@ app.get('/citas', (req, res) => {
 });
 
 //Ruta para modificar los detalles de una cita
+app.put('/citas/:id', (req, res) => {
+    const { id } = req.params;
+    const { fecha, estado, tipo } = req.body;
+
+    const sql = 'UPDATE citas SET fecha = ?, estado = ?, tipo = ? WHERE id = ?';
+
+    db.query(sql, [fecha, estado, tipo, id], (err, result) => {
+        if (err) {
+            return res.status(500).send('Error actualizando la cita');
+        }
+        res.send('Cita actualizada existosamente');
+    });
+});
+
+// Ruta para eliminar un usuario
+app.delete('/citas/:id', (req, res) => {
+    const { id } = req.params;
+
+    const sql = 'DELETE FROM citas WHERE id = ?';
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            return res.status(500).send('Error eliminando la cita');
+        }
+        res.send('Cita eliminada correctamente');
+    });
+});
