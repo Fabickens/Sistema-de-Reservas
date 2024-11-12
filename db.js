@@ -1,20 +1,12 @@
 const mysql = require('mysql2');
-
-// Crear conexión a la base de datos
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root', // Cambie esto por su usuario de MySQL
-  password: 'malparidos20', // Cambie esto por su contraseña de MySQL
-  database: 'sistema_reservas'
+const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: 'malparidos20', // Cambia esto por tu contraseña de MySQL
+    database: 'proyecto_graduacion',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Conectar a MySQL
-connection.connect((err) => {
-  if (err) {
-    console.error('Error conectando a la base de datos:', err);
-    return;
-  }
-  console.log('Conectado a la base de datos MySQL');
-});
-
-module.exports = connection;
+module.exports = pool.promise(); // Exportamos el pool como promesa para usar async/await
