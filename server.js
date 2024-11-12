@@ -1,5 +1,7 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
+
 // Importar las rutas para CRUD
 const userRoutes = require('./routes/userRoutes'); 
 const appointmentRoutes = require('./routes/appointmentRoutes');
@@ -7,7 +9,10 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const medicalHistoryRoutes = require('./routes/medicalHistoryRoutes');
 const specialtyRoutes = require('./routes/specialtyRoutes');
 
-
+// Permitir CORS para solicitudes desde el origen del frontend
+app.use(cors({
+    origin: 'http://localhost:5173' 
+}));
 
 // Middleware para procesar datos JSON
 app.use(express.json());

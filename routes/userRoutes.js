@@ -7,8 +7,8 @@ const authenticateToken = require('../middleware/authMiddleware');
 
 // Endpoint para registrar un usuario con una contraseña encriptada
 router.post('/usuarios/registrar', async (req, res) => {
-    const { cedula, nombre, correo, contraseña, rol, telefono, genero, fecha_nacimiento, direccion } = req.body;
-
+    const { cedula, nombre, correo, contraseña, telefono, genero, fecha_nacimiento, direccion } = req.body;
+    const rol = 'paciente';
     try {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contraseña, salt);
