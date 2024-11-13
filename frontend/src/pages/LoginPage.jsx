@@ -22,7 +22,7 @@ function LoginPage() {
                 navigate('/'); // Redirigir al dashboard o página principal
             }
         } catch (error) {
-            console.error('Error al iniciar sesión:', error);
+            console.error('Error al iniciar sesión:', error.response ? error.response.data : error.message);
             alert('Error al iniciar sesión. Verifica tus credenciales.');
         }
     };
