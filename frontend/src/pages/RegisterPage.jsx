@@ -34,7 +34,7 @@ function RegisterPage() {
     return (
         <div className="flex justify-center items-center h-screen bg-gray-100">
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md max-w-md w-full">
-                <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">Crear Cuenta</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center text-teal-500">Crear Cuenta</h2>
                 <div className="mb-4">
                     <label className="block text-gray-700">Cédula</label>
                     <input
@@ -77,7 +77,7 @@ function RegisterPage() {
                 </div>
                 <button
                     type="submit"
-                    className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+                    className="bg-teal-500 text-white w-full py-2 rounded hover:bg-teal-600"
                 >
                     Crear Cuenta
                 </button>
