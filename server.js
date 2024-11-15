@@ -17,7 +17,7 @@ app.use(cors({
 // Middleware para procesar datos JSON
 app.use(express.json());
 
-// Usar las rutas bajo el prefijo /api
+// Uso las rutas bajo el prefijo /api
 app.use('/api', userRoutes);
 app.use('/api', appointmentRoutes);
 app.use('/api', notificationRoutes);

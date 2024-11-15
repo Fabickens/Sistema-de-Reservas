@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function RegisterPage() {
     const [cedula, setCedula] = useState('');
@@ -32,57 +32,59 @@ function RegisterPage() {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md max-w-md w-full">
-                <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">Crear Cuenta</h2>
-                <div className="mb-4">
-                    <label className="block text-gray-700">Cédula</label>
+        <form onSubmit={handleSubmit} className="min-h-[80vh] flex items-centerl">
+            <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
+                <h2 className="text-2xl font-semibold">Crear Cuenta</h2>
+                <p>Por favor cree una cuenta para reservar una cita</p>
+                <div className="w-full">
+                <p>Cédula</p>
                     <input
                         type="text"
                         value={cedula}
                         onChange={(e) => setCedula(e.target.value)}
-                        className="w-full px-3 py-2 border rounded"
+                        className="border border-zinc-300 rounded w-full p-2 mt-1"
                         required
                     />
                 </div>
-                <div className="mb-4">
+                <div className="w-full">
                     <label className="block text-gray-700">Nombre</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full px-3 py-2 border rounded"
+                        className="border border-zinc-300 rounded w-full p-2 mt-1"
                         required
                     />
                 </div>
-                <div className="mb-4">
+                <div className="w-full">
                     <label className="block text-gray-700">Correo Electrónico</label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-3 py-2 border rounded"
+                        className="border border-zinc-300 rounded w-full p-2 mt-1"
                         required
                     />
                 </div>
-                <div className="mb-6">
+                <div className="w-full">
                     <label className="block text-gray-700">Contraseña</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-3 py-2 border rounded"
+                        className="border border-zinc-300 rounded w-full p-2 mt-1"
                         required
                     />
                 </div>
                 <button
                     type="submit"
-                    className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+                    className="bg-verde text-white w-full py-2 rounded-md text-base font-semibold hover:bg-celeste"
                 >
                     Crear Cuenta
                 </button>
-            </form>
-        </div>
+                <p>¿Ya tienes una cuenta? <Link to='/login'className='text-primary underline cursor-pointer'>Inicia sesión</Link></p>
+            </div>
+        </form>  
     );
 }
 
