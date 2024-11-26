@@ -28,35 +28,40 @@ router.get('/especialidades', async (req, res) => {
 });
 
 // Asignar una especialidad a un doctor
-router.post('/doctor_especialidad', async (req, res) => {
-    const { id_doctor, id_especialidad } = req.body;
+router.post('/doctores/:id/especialidades', async (req, res) => {
+    const { id } = req.params; // ID del doctor
+    const { id_especialidades } = req.body; // Array de IDs de especialidades
 
     try {
         const sql = `INSERT INTO doctor_especialidad (id_doctor, id_especialidad) VALUES (?, ?)`;
-        await db.query(sql, [id_doctor, id_especialidad]);
-        res.status(201).json({ message: 'Especialidad asignada al doctor exitosamente' });
+        for (const id_especialidad of id_especialidades) {
+            await db.query(sql, [id, id_especialidad]);
+        }
+        res.status(201).json({ message: 'Especialidades asignadas exitosamente.' });
     } catch (error) {
-        console.error("Error al asignar especialidad al doctor:", error);
-        res.status(500).json({ message: 'Error al asignar especialidad al doctor', error });
+        console.error('Error al asignar especialidades:', error);
+        res.status(500).json({ message: 'Error al asignar especialidades.', error });
     }
 });
 
+
 // Obtener todas las especialidades de un doctor
-router.get('/doctor_especialidades/:id_doctor', async (req, res) => {
-    const { id_doctor } = req.params;
+router.get('/doctores/:id/especialidades', async (req, res) => {
+    const { id } = req.params;
 
     try {
         const sql = `
             SELECT e.nombre, e.descripcion
-            FROM especialidades e
-            JOIN doctor_especialidad de ON e.id = de.id_especialidad
+            FROM doctor_especialidad de
+            JOIN especialidades e ON de.id_especialidad = e.id
             WHERE de.id_doctor = ?
         `;
-        const [result] = await db.query(sql, [id_doctor]);
+        const [result] = await db.query(sql, [id]);
         res.status(200).json(result);
     } catch (error) {
-        console.error("Error al obtener especialidades del doctor:", error);
-        res.status(500).json({ message: 'Error al obtener especialidades del doctor', error });
+        console.error('Error al obtener especialidades del doctor:', error);
+        res.status(500).json({ message: 'Error al obtener especialidades del doctor.', error });
     }
 });
+
  module.exports = router;

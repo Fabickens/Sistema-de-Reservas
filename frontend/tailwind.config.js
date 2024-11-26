@@ -9,7 +9,8 @@ export default {
       colors:{
         'primary':'#5f6FFF',
         'verde':'#26d9d0',
-        'celeste':'#22c3bb'
+        'celeste':'#22c3bb',
+        'fondo':'#eafafa'
       }
     },
   },

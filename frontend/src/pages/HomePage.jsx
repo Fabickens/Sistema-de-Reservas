@@ -1,12 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import Encabezado from '../components/Encabezado';
 import Banner from '../components/Banner';
+import Especialidad from '../components/Especialidad';
+
 
 const HomePage = () =>{
     return(
         <div>
             <Encabezado/>
+            <Especialidad/>
             <Banner/>
         </div>
     )

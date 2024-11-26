@@ -7,6 +7,8 @@ import RegisterPage from './pages/RegisterPage';
 import Footer from './components/Footer';
 import About from './pages/About';
 import Contact from './pages/Contacto';
+import AppointmentsPage from './pages/AppointmentsPage';
+import NewAppointmentPage from './pages/NewAppointmentPage';
 
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
+                    <Route path="/appointments" element={<AppointmentsPage/>}/>
+                    <Route path="/appointments/new" element={<NewAppointmentPage />} />
                 </Routes>
                 <Footer/>
             </div> 

@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../db'); // Importar conexión a la base de datos
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const authenticateToken = require('../middleware/authMiddleware');
+const authenticateToken = require('../middlewares/authMiddleware');
 
 // Endpoint para registrar un usuario con una contraseña encriptada
 router.post('/usuarios/registrar', async (req, res) => {
