@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db'); // Importar conexión a la base de datos
+const { authenticateToken, authorizeRole } = require('../middlewares/authMiddleware');
+
 
 // Crear una nueva cita
 router.post('/citas', async (req, res) => {
@@ -82,4 +84,37 @@ router.delete('/citas/:id', async (req, res) => {
     }
 });
 
+//Ver citas de un paciente (solo pacientes)
+router.get('/citas/paciente/:id', authenticateToken, authorizeRole(['paciente']), async (req, res) => {
+    const { id } = req.params;
+    if (req.user.id != id) {
+        return res.status(403).json({ message: 'No puedes acceder a las citas de otro paciente.' });
+    }
+
+    try {
+        const sql = `SELECT * FROM citas WHERE id_paciente = ?`;
+        const [result] = await db.query(sql, [id]);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error al obtener citas del paciente:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' });
+    }
+});
+
+//Ver citas de un doctor (solo doctores)
+router.get('/citas/doctor/:id', authenticateToken, authorizeRole(['doctor']), async (req, res) => {
+    const { id } = req.params;
+    if (req.user.id != id) {
+        return res.status(403).json({ message: 'No puedes acceder a las citas de otro doctor.' });
+    }
+
+    try {
+        const sql = `SELECT * FROM citas WHERE id_doctor = ?`;
+        const [result] = await db.query(sql, [id]);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error al obtener citas del doctor:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' });
+    }
+});
  module.exports = router;
