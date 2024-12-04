@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+// Middleware para autenticar el token
 function authenticateToken(req, res, next) {
     const token = req.header('Authorization')?.split(' ')[1]; // El token va en el header Authorization: Bearer <token>
 
@@ -14,4 +15,14 @@ function authenticateToken(req, res, next) {
     }
 }
 
-module.exports = authenticateToken;
+// Middleware para autorizar según el rol
+function authorizeRole(roles) {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.rol)) {
+            return res.status(403).json({ message: 'No tienes permiso para acceder a esta funcionalidad.' });
+        }
+        next();
+    };
+}
+
+module.exports = { authenticateToken, authorizeRole };
