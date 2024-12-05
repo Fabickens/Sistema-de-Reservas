@@ -14,7 +14,7 @@ router.post('/usuarios/registrar', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contraseña, salt);
 
-        // Consulta SQL para insertar un nuevo usuario (usando hashedPassword)
+        // Consulta SQL para insertar un nuevo usuario (usando hashedPassword)z
         const sql = `INSERT INTO usuarios (cedula, nombre, correo, contraseña, rol, telefono, genero, fecha_nacimiento, direccion)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -27,7 +27,7 @@ router.post('/usuarios/registrar', async (req, res) => {
 });
 
 // Obtener todos los usuarios
-router.get('/usuarios', authenticateToken, authorizeRole(['administrador']), async (req, res) => {
+router.get('/usuarios', authenticateToken, authorizeRole(['administrador']),async (req, res) => {
     try {
         const [result] = await db.query('SELECT * FROM usuarios');
         res.status(200).json(result);
@@ -38,12 +38,12 @@ router.get('/usuarios', authenticateToken, authorizeRole(['administrador']), asy
 });
 
 // Obtener un usuario por ID (solo administradores o el propio usuario)
-router.get('/usuarios/:id', authenticateToken, async (req, res) => {
+router.get('/usuarios/:id', async (req, res) => {
     const { id } = req.params;
 
-    // Permitir acceso solo si es administrador o el propio usuario
-    if (req.user.rol !== 'administrador' && req.user.id != id) {
-        return res.status(403).json({ message: 'No tienes permiso para acceder a esta información.' });
+     // Verificar si el usuario es administrador o si está accediendo a su propia información
+     if (req.user.rol !== 'administrador' && req.user.id !== parseInt(id)) {
+        return res.status(403).json({ message: 'No tienes permiso para acceder a esta información' });
     }
 
     try {
@@ -115,7 +115,7 @@ router.post('/usuarios/login', async (req, res) => {
         }
 
         // Generar el token JWT
-        const token = jwt.sign({ id: usuario.id, rol: usuario.rol }, 'tu_secreto_jwt', { expiresIn: '1h' });
+        const token = jwt.sign({ id: usuario.id, nombre: usuario.nombre, rol: usuario.rol }, 'tu_secreto_jwt', { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Inicio de sesión exitoso', token });
     } catch (error) {

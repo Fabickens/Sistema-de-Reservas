@@ -86,4 +86,16 @@ router.delete('/doctores/:id', async (req, res) => {
     }
 });
 
+router.get('/especialidades', async (req, res) => {
+    try {
+        const sql = `SELECT DISTINCT especialidad FROM doctores WHERE especialidad IS NOT NULL AND especialidad != ''`;
+        const [result] = await db.query(sql);
+        res.status(200).json(result.map(row => row.especialidad));
+    } catch (error) {
+        console.error('Error al obtener especialidades:', error);
+        res.status(500).json({ message: 'Error al obtener especialidades.', error });
+    }
+});
+
+
 module.exports = router;
