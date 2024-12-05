@@ -3,17 +3,18 @@ const router = express.Router();
 const db = require('../db'); // Importar conexión a la base de datos
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const authenticateToken = require('../middlewares/authMiddleware');
+const { authenticateToken, authorizeRole } = require('../middlewares/authMiddleware');
+
 
 // Endpoint para registrar un usuario con una contraseña encriptada
 router.post('/usuarios/registrar', async (req, res) => {
     const { cedula, nombre, correo, contraseña, telefono, genero, fecha_nacimiento, direccion } = req.body;
-    const rol = 'paciente';
+    const rol = req.body.rol || 'paciente'; // Permite especificar el rol desde el body
     try {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contraseña, salt);
 
-        // Consulta SQL para insertar un nuevo usuario (usando hashedPassword)
+        // Consulta SQL para insertar un nuevo usuario (usando hashedPassword)z
         const sql = `INSERT INTO usuarios (cedula, nombre, correo, contraseña, rol, telefono, genero, fecha_nacimiento, direccion)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -26,19 +27,24 @@ router.post('/usuarios/registrar', async (req, res) => {
 });
 
 // Obtener todos los usuarios
-router.get('/usuarios', async (req, res) => {
+router.get('/usuarios', authenticateToken, authorizeRole(['administrador']),async (req, res) => {
     try {
         const [result] = await db.query('SELECT * FROM usuarios');
         res.status(200).json(result);
     } catch (error) {
         console.error("Error al obtener usuarios:", error);
-        res.status(500).json({ message: 'Error al obtener usuarios', error });
+        res.status(500).json({ message: 'Error interno del servidor', error });
     }
 });
 
-// Obtener un usuario por ID
+// Obtener un usuario por ID (solo administradores o el propio usuario)
 router.get('/usuarios/:id', async (req, res) => {
     const { id } = req.params;
+
+     // Verificar si el usuario es administrador o si está accediendo a su propia información
+     if (req.user.rol !== 'administrador' && req.user.id !== parseInt(id)) {
+        return res.status(403).json({ message: 'No tienes permiso para acceder a esta información' });
+    }
 
     try {
         const [result] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id]);
@@ -51,6 +57,7 @@ router.get('/usuarios/:id', async (req, res) => {
         res.status(500).json({ message: 'Error al obtener usuario', error });
     }
 });
+
 
 // Actualizar un usuario por ID
 router.put('/usuarios/:id', async (req, res) => {
@@ -108,7 +115,7 @@ router.post('/usuarios/login', async (req, res) => {
         }
 
         // Generar el token JWT
-        const token = jwt.sign({ id: usuario.id, rol: usuario.rol }, 'tu_secreto_jwt', { expiresIn: '1h' });
+        const token = jwt.sign({ id: usuario.id, nombre: usuario.nombre, rol: usuario.rol }, 'tu_secreto_jwt', { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Inicio de sesión exitoso', token });
     } catch (error) {
@@ -116,6 +123,8 @@ router.post('/usuarios/login', async (req, res) => {
         res.status(500).json({ message: 'Error en inicio de sesión', error });
     }
 });
+
+
 
 module.exports = router;
 

@@ -9,26 +9,28 @@ import About from './pages/About';
 import Contact from './pages/Contacto';
 import AppointmentsPage from './pages/AppointmentsPage';
 import NewAppointmentPage from './pages/NewAppointmentPage';
+import DoctorsPage from './pages/DoctorsPage';
+import ProtectedRoute from './components/Protectedroute';
 
 
 function App() {
     return (
-        <Router>
-            <div className='mx-4 sm:mx-[10%]'>
-                <Navbar/>
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/appointments" element={<AppointmentsPage/>}/>
-                    <Route path="/appointments/new" element={<NewAppointmentPage />} />
-                </Routes>
-                <Footer/>
-            </div> 
-        </Router>
-        
+            <Router>
+                <div className='mx-4 sm:mx-[10%]'>
+                    <Navbar/>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/doctores" element={<DoctorsPage />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/appointments" element={<ProtectedRoute> <AppointmentsPage/> </ProtectedRoute>}/>
+                        <Route path="/appointments/new" element={<ProtectedRoute> <NewAppointmentPage /> </ProtectedRoute>} />
+                    </Routes>
+                    <Footer/>
+                </div> 
+            </Router>
     );
 }
 

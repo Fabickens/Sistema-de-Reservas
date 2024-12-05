@@ -12,9 +12,11 @@ import chats_icon from './chats_icon.svg'
 import verified_icon from './verified_icon.svg'
 import arrow_icon from './arrow_icon.svg'
 import info_icon from './info_icon.svg'
+import upload_area from './upload_area.png'
 import upload_icon from './upload_icon.png'
 import stripe_logo from './stripe_logo.png'
 import razorpay_logo from './razorpay_logo.png'
+import usuario from './usuario.png'
 import doc1 from './doc1.png'
 import doc2 from './doc2.png'
 import doc3 from './doc3.png'
@@ -39,6 +41,7 @@ import Neurologia from './Neurologia.svg'
 
 
 export const assets = {
+    usuario,
     appointment_img,
     header_img,
     group_profiles,
@@ -53,6 +56,7 @@ export const assets = {
     menu_icon,
     cross_icon,
     dropdown_icon,
+    upload_area,
     upload_icon,
     stripe_logo,
     razorpay_logo

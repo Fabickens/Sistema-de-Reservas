@@ -3,37 +3,31 @@ const router = express.Router();
 const db = require('../db'); // Conexión a la base de datos
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { cloudinary } = require('../config/cloudinary');
-const fs = require('fs');
+const { authenticateToken, authorizeRole } = require('../middlewares/authMiddleware');
 
-
-// Registrar un nuevo doctor
-router.post('/doctores/registrar', async (req, res) => {
-    const { nombre, correo, contraseña, experiencia, acerca, precio, direccion } = req.body;
+//Registrar un nuevo doctor
+router.post('/doctores/registrar', authenticateToken, authorizeRole(['administrador']), async (req, res) => {
+    const { nombre, correo, contraseña, especialidad, experiencia, acerca, precio, direccion } = req.body;
 
     try {
-        // Encriptar contraseña
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(contraseña, salt);
-
-        // Insertar en la base de datos
+        const hashedPassword = await bcrypt.hash(contraseña, 10);
         const sql = `
-            INSERT INTO doctores (nombre, correo, contraseña, experiencia, acerca, precio, direccion)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO doctores (nombre, correo, contraseña, especialidad, experiencia, acerca, precio, direccion)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        await db.query(sql, [nombre, correo, hashedPassword, experiencia, acerca, precio, direccion]);
-
+        await db.query(sql, [nombre, correo, hashedPassword, especialidad, experiencia, acerca, precio, direccion]);
         res.status(201).json({ message: 'Doctor registrado exitosamente.' });
     } catch (error) {
         console.error('Error al registrar doctor:', error);
-        res.status(500).json({ message: 'Error al registrar doctor.', error });
+        res.status(500).json({ message: 'Error interno del servidor.' });
     }
 });
 
 //Obtener todos los doctores
 router.get('/doctores', async (req, res) => {
     try {
-        const [result] = await db.query('SELECT * FROM doctores');
+        const sql = 'SELECT * FROM doctores'
+        const [result] = await db.query(sql);
         res.status(200).json(result);
     } catch (error) {
         console.error('Error al obtener doctores:', error);
@@ -75,5 +69,33 @@ router.put('/doctores/:id', async (req, res) => {
         res.status(500).json({ message: 'Error al actualizar doctor.', error });
     }
 });
+
+// Eliminar un doctor por ID
+router.delete('/doctores/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [result] = await db.query('DELETE FROM doctores WHERE id = ?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Doctor no encontrado' });
+        }
+        res.status(200).json({ message: 'Doctor eliminado exitosamente' });
+    } catch (error) {
+        console.error("Error al eliminar doctor:", error);
+        res.status(500).json({ message: 'Error al eliminar doctor', error });
+    }
+});
+
+router.get('/especialidades', async (req, res) => {
+    try {
+        const sql = `SELECT DISTINCT especialidad FROM doctores WHERE especialidad IS NOT NULL AND especialidad != ''`;
+        const [result] = await db.query(sql);
+        res.status(200).json(result.map(row => row.especialidad));
+    } catch (error) {
+        console.error('Error al obtener especialidades:', error);
+        res.status(500).json({ message: 'Error al obtener especialidades.', error });
+    }
+});
+
 
 module.exports = router;
