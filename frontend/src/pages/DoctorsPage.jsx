@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api'; // Ajusta según tu configuración de Axios o fetch
+import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../api'; // Configuración de Axios o fetch
 
 const DoctorsPage = () => {
-    const [doctores, setDoctores] = useState([]); // Lista de doctores
+    const [doctores, setDoctores] = useState([]); // Lista completa de doctores
     const [filterDoc, setFilterDoc] = useState([]); // Doctores filtrados
-    const [speciality, setSpeciality] = useState(''); // Especialidad seleccionada
-    const [showFilter, setShowFilter] = useState(false); // Mostrar/ocultar filtros
+    const [specialities, setSpecialities] = useState([]); // Especialidades únicas
+    const [selectedSpeciality, setSelectedSpeciality] = useState(''); // Especialidad seleccionada
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDoctores = async () => {
             try {
-                const response = await api.get('/doctores'); // Endpoint del backend
+                // Solicitar doctores desde el backend
+                const response = await api.get('/doctores');
                 setDoctores(response.data);
-                setFilterDoc(response.data); // Inicialmente mostrar todos los doctores
+                setFilterDoc(response.data); // Mostrar todos inicialmente
+
+                // Obtener especialidades únicas de los doctores
+                const uniqueSpecialities = [
+                    ...new Set(response.data.map((doctor) => doctor.especialidad))
+                ];
+                setSpecialities(uniqueSpecialities);
             } catch (error) {
                 console.error('Error al cargar doctores:', error);
             }
@@ -23,47 +30,48 @@ const DoctorsPage = () => {
         fetchDoctores();
     }, []);
 
-    // Manejar la selección de especialidades
-    const handleSpeciality = (selectedSpeciality) => {
-        if (speciality === selectedSpeciality) {
-            setSpeciality('');
-            setFilterDoc(doctores); // Mostrar todos los doctores si se deselecciona
+    // Manejar la selección de filtros
+    const handleSpecialityFilter = (speciality) => {
+        if (selectedSpeciality === speciality) {
+            setSelectedSpeciality(''); // Quitar filtro
+            setFilterDoc(doctores); // Mostrar todos los doctores
         } else {
-            setSpeciality(selectedSpeciality);
-            setFilterDoc(doctores.filter(doc => doc.especialidad === selectedSpeciality));
+            setSelectedSpeciality(speciality);
+            setFilterDoc(doctores.filter((doc) => doc.especialidad === speciality));
         }
     };
 
     return (
-        <div>
-            <p className='text-gray-600'>Filtra la busqueda por especialidad.</p>
-            <div className='flex flex-col sm:flex-row items-start gap-5 mt-5'>
-                <button onClick={() => setShowFilter(!showFilter)} className={`py-1 px-3 border rounded text-sm transition-all sm:hidden ${showFilter ? 'bg-primary text-white' : ''}`}>
-                    Filters
-                </button>
-                <div className={`flex-col gap-4 text-sm text-gray-600 ${showFilter ? 'flex' : 'hidden sm:flex'}`}>
-                    {['Medico General', 'Ginecologia', 'Dermatologia', 'Pediatria', 'Neurologia', 'Cardiologia'].map((specialityName) => (
+        <div className="container mx-auto p-4">
+            <p className="text-black font-semibold">Busca doctores inmediatamente por especialidad.</p>
+            <div className="flex flex-col sm:flex-row items-start gap-5 mt-5">
+                {/* Filtros */}
+                <div className="flex-col gap-4 text-sm text-black font-semibold flex">
+                    {specialities.map((speciality) => (
                         <p
-                            key={specialityName}
-                            onClick={() => handleSpeciality(specialityName)}
-                            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${speciality === specialityName ? 'bg-[#E2E5FF] text-black ' : ''}`}
+                            key={speciality}
+                            onClick={() => handleSpecialityFilter(speciality)}
+                            className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+                                selectedSpeciality === speciality ? 'bg-celeste text-white ' : ''
+                            }`}
                         >
-                            {specialityName}
+                            {speciality}
                         </p>
                     ))}
                 </div>
-                <div className='w-full grid grid-cols-auto gap-4 gap-y-6'>
-                    {filterDoc.map((item, index) => (
+
+                {/* Listado de Doctores */}
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filterDoc.map((doctor) => (
                         <div
-                            onClick={() => { navigate(`/appointment/${item.id}`); window.scrollTo(0, 0); }}
-                            className='border border-[#C9D8FF] rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
-                            key={index}
+                            key={doctor.id}
+                            onClick={() => navigate(`/appointment/${doctor.id}`)}
+                            className="border border-gray-300 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all"
                         >
-                            <img className='bg-[#EAEFFF]' src={item.image || 'default-image-path'} alt="Doctor" />
-                            <div className='p-4'>
-                                <p className='text-[#262626] text-lg font-medium'>{item.nombre}</p>
-                                <p className='text-[#5C5C5C] text-sm'>{item.especialidad}</p>
-                            </div>
+                            <p className="text-lg font-bold text-gray-800">{doctor.nombre}</p>
+                            <p className="text-sm text-gray-600">{doctor.especialidad}</p>
+                            <p className="text-sm text-gray-600">{doctor.direccion}</p>
+                            <p className="text-sm text-gray-600">${doctor.precio} por consulta</p>
                         </div>
                     ))}
                 </div>
