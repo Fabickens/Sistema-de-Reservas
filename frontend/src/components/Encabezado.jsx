@@ -14,7 +14,7 @@ const Encabezado = () => {
                     <img className='w-28' src={assets.group_profiles} alt="" />
                     <p>Contamos con una lista larga de profesionales de la salud. <br className='hidden sm:block' /> Información sin costo alguno.</p>
                 </div>
-                <a href='#especialidad' className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-600 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300'>
+                <a href='/appointments/new' className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-600 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300'>
                     Reserva tu cita <img className='w-3' src={assets.arrow_icon} alt="" />
                 </a>
             </div>

@@ -1,19 +1,23 @@
 const jwt = require('jsonwebtoken');
 
 // Middleware para autenticar el token
-function authenticateToken(req, res, next) {
-    const token = req.header('Authorization')?.split(' ')[1]; // El token va en el header Authorization: Bearer <token>
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) return res.status(401).json({ message: 'Acceso denegado, se requiere autenticación' });
-
-    try {
-        const verified = jwt.verify(token, 'tu_secreto_jwt');
-        req.user = verified;
-        next();
-    } catch (error) {
-        res.status(403).json({ message: 'Token no válido' });
+    if (!token) {
+        return res.status(403).json({ message: 'Acceso denegado: Token no proporcionado' });
     }
-}
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Acceso denegado: Token inválido' });
+        }
+        console.log('Token recibido:', token);
+        req.user = user; // Almacenar los datos del usuario en la solicitud
+        next();
+    });
+};
 
 // Middleware para autorizar según el rol
 function authorizeRole(roles) {

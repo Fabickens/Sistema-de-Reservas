@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const connectCloudinary = require('./config/cloudinary').connectCloudinary;
+require('dotenv').config();
 
 
 // Importar las rutas para CRUD

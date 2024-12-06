@@ -45,9 +45,10 @@ const Navbar = () => {
                         <img className='w-2.5' src={assets.dropdown_icon} alt="" />
                         <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
                           <div className='min-w-48 bg-gray-50 rounded flex flex-col gap-4 p-4'>
-                            <p onClick={() => navigate('')} className='hover:text-black cursor-pointer'>My Profile</p>
-                            <p onClick={() => navigate('/appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
-                            <p onClick={handleLogout} className='hover:text-black cursor-pointer'>Logout</p>
+                            <p onClick={() => navigate('/MyprofilePage')} className='hover:text-black cursor-pointer'>Mi Perfil</p>
+                            <p onClick={() => navigate('/appointments/new')} className='hover:text-black cursor-pointer'>Reservar Cita</p>
+                            <p onClick={() => navigate('/appointments')} className='hover:text-black cursor-pointer'>Mis Citas</p>
+                            <p onClick={handleLogout} className='hover:text-black cursor-pointer'>Cerrar Sesión</p>
                           </div>
                         </div>
                       </div>
