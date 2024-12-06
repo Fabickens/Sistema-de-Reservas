@@ -37,8 +37,23 @@ router.get('/usuarios', authenticateToken, authorizeRole(['administrador']),asyn
     }
 });
 
+router.get('/usuarios/perfil', authenticateToken, async (req, res) => {
+    try {
+        const sql = `SELECT nombre, correo, telefono, direccion, genero, fecha_nacimiento FROM usuarios WHERE id = ?`;
+        const [result] = await db.query(sql, [req.user.id]);
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.status(200).json(result[0]);
+    } catch (error) {
+        console.error('Error al obtener perfil:', error);
+        res.status(500).json({ message: 'Error al obtener perfil', error });
+    }
+});
+
+
 // Obtener un usuario por ID (solo administradores o el propio usuario)
-router.get('/usuarios/:id', async (req, res) => {
+router.get('/usuarios/id/:id', async (req, res) => {
     const { id } = req.params;
 
      // Verificar si el usuario es administrador o si está accediendo a su propia información
@@ -58,14 +73,29 @@ router.get('/usuarios/:id', async (req, res) => {
     }
 });
 
+router.put('/usuarios/perfil', authenticateToken, async (req, res) => {
+    const { nombre, correo, telefono, direccion, genero, fecha_nacimiento } = req.body;
+    try {
+        const sql = `UPDATE usuarios SET nombre = ?, correo = ?, telefono = ?, direccion = ?, genero = ?, fecha_nacimiento = ? WHERE id = ?`;
+        const [result] = await db.query(sql, [nombre, correo, telefono, direccion, genero, fecha_nacimiento, req.user.id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.status(200).json({ message: 'Perfil actualizado exitosamente' });
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        res.status(500).json({ message: 'Error al actualizar perfil', error });
+    }
+});
+
 
 // Actualizar un usuario por ID
-router.put('/usuarios/:id', async (req, res) => {
+router.put('/usuarios/id/:id', async (req, res) => {
     const { id } = req.params;
     const { cedula, nombre, correo, telefono, genero, fecha_nacimiento, direccion } = req.body;
 
     try {
-        const sql = `UPDATE usuarios SET cedula = ?, nombre = ?, correo = ?, telefono = ?, genero = ?, fecha_nacimiento = ?, direccion = ? WHERE id = ?`;
+        const sql = `UPDATE usuarios SET cedula = ?, nombre = ?, correo = ?, telefono = ?, direccion = ? WHERE id = ?`;
         const [result] = await db.query(sql, [cedula, nombre, correo, telefono, genero, fecha_nacimiento, direccion, id]);
 
         if (result.affectedRows === 0) {
@@ -115,7 +145,7 @@ router.post('/usuarios/login', async (req, res) => {
         }
 
         // Generar el token JWT
-        const token = jwt.sign({ id: usuario.id, nombre: usuario.nombre, rol: usuario.rol }, 'tu_secreto_jwt', { expiresIn: '1h' });
+        const token = jwt.sign({ id: usuario.id, nombre: usuario.nombre, rol: usuario.rol }, process.env.JWT_SECRET);
 
         res.status(200).json({ message: 'Inicio de sesión exitoso', token });
     } catch (error) {
