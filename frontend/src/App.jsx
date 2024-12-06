@@ -10,6 +10,7 @@ import Contact from './pages/Contacto';
 import AppointmentsPage from './pages/AppointmentsPage';
 import NewAppointmentPage from './pages/NewAppointmentPage';
 import DoctorsPage from './pages/DoctorsPage';
+import MyprofilePage from './pages/MyprofilePage';
 import ProtectedRoute from './components/Protectedroute';
 
 
@@ -27,6 +28,7 @@ function App() {
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/appointments" element={<ProtectedRoute> <AppointmentsPage/> </ProtectedRoute>}/>
                         <Route path="/appointments/new" element={<ProtectedRoute> <NewAppointmentPage /> </ProtectedRoute>} />
+                        <Route path="/MyprofilePage" element={<ProtectedRoute> <MyprofilePage/> </ProtectedRoute>}/>
                     </Routes>
                     <Footer/>
                 </div> 
