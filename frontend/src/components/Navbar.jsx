@@ -8,7 +8,7 @@ const Navbar = () => {
     const [showMenu, setShowMenu] = useState(false)
     const handleLogout = () => {
         localStorage.removeItem('token'); // Eliminar el token del almacenamiento local
-        navigate('/login'); // Redirigir al login después de cerrar sesión
+        navigate('/'); // Redirigir al login después de cerrar sesión
     };
 
     // Verificar si el usuario está autenticado
