@@ -5,12 +5,12 @@ const AppointmentsPage = () => {
     const [citas, setCitas] = useState([]);
     const [editingCita, setEditingCita] = useState(null); // Cita en edición
     const [newFecha, setNewFecha] = useState(''); // Nueva fecha para edición
+    const [newHora, setNewHora] = useState(''); // Nueva hora para edición
     const [newNotas, setNewNotas] = useState(''); // Nuevas notas para edición
 
     useEffect(() => {
         const fetchCitas = async () => {
             try {
-                // Cambia a la nueva ruta
                 const response = await api.get('/citas/personales');
                 setCitas(response.data.citas);
             } catch (error) {
@@ -20,40 +20,57 @@ const AppointmentsPage = () => {
 
         fetchCitas();
     }, []);
-    
-    
-    // Manejar la cancelación de citas
+
+    const generateTimeSlots = () => {
+        const slots = [];
+        const start = new Date();
+        start.setHours(8, 0, 0);
+
+        const end = new Date();
+        end.setHours(17, 0, 0);
+
+        while (start < end) {
+            const hour = start.getHours();
+            const minutes = start.getMinutes();
+            const formattedTime = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            slots.push(formattedTime);
+            start.setMinutes(start.getMinutes() + 30);
+        }
+        return slots;
+    };
+
+    const timeSlots = generateTimeSlots();
+
     const handleCancel = async (id) => {
         try {
             await api.delete(`/citas/${id}`);
             alert('Cita cancelada exitosamente.');
-            setCitas(citas.filter((cita) => cita.cita_id !== id)); // Actualizar lista en el frontend
+            setCitas(citas.filter((cita) => cita.cita_id !== id));
         } catch (error) {
             console.error('Error al cancelar cita:', error.response?.data || error.message);
             alert('No se pudo cancelar la cita.');
         }
     };
 
-     // Manejar el inicio de edición
-     const handleEditStart = (cita) => {
+    const handleEditStart = (cita) => {
         setEditingCita(cita);
-        setNewFecha(cita.fecha);
+        setNewFecha(cita.fecha.split('T')[0]); // Extraer solo la fecha
+        setNewHora(cita.fecha.split('T')[1].slice(0, 5)); // Extraer solo la hora
         setNewNotas(cita.notas || '');
     };
 
-    // Manejar la edición de citas
     const handleEditSubmit = async (id) => {
         try {
+            const fullDateTime = `${newFecha}T${newHora}:00`;
             await api.put(`/citas/${id}`, {
-                fecha: newFecha,
+                fecha: fullDateTime,
                 notas: newNotas
             });
             alert('Cita actualizada exitosamente.');
-            setEditingCita(null); // Salir del modo de edición
-            // Actualizar la lista de citas
+            setEditingCita(null);
             setCitas(citas.map((cita) => (
                 cita.cita_id === id 
-                ? { ...cita, fecha: newFecha, notas: newNotas }
+                ? { ...cita, fecha: fullDateTime, notas: newNotas }
                 : cita
             )));
         } catch (error) {
@@ -76,8 +93,6 @@ const AppointmentsPage = () => {
                             <p><strong>Fecha:</strong> {new Date(cita.fecha).toLocaleString()}</p>
                             <p><strong>Tipo:</strong> {cita.tipo}</p>
                             <p><strong>Notas:</strong> {cita.notas || 'Sin notas'}</p>
-
-                            {/* Botones de acciones */}
                             <div className="mt-4 flex gap-2">
                                 <button
                                     onClick={() => handleEditStart(cita)}
@@ -99,7 +114,6 @@ const AppointmentsPage = () => {
                 <p>No tienes citas registradas.</p>
             )}
 
-            {/* Formulario para editar cita */}
             {editingCita && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded shadow-lg w-96">
@@ -107,11 +121,25 @@ const AppointmentsPage = () => {
                         <label className="block mb-2">
                             Nueva Fecha:
                             <input
-                                type="datetime-local"
+                                type="date"
                                 value={newFecha}
                                 onChange={(e) => setNewFecha(e.target.value)}
                                 className="w-full mt-1 p-2 border rounded"
                             />
+                        </label>
+                        <label className="block mb-4">
+                            Hora:
+                            <select
+                                value={newHora}
+                                onChange={(e) => setNewHora(e.target.value)}
+                                className="w-full mt-1 p-2 border rounded"
+                                required
+                            >
+                                <option value="" disabled>Selecciona un horario</option>
+                                {timeSlots.map((slot) => (
+                                    <option key={slot} value={slot}>{slot}</option>
+                                ))}
+                            </select>
                         </label>
                         <label className="block mb-4">
                             Notas:

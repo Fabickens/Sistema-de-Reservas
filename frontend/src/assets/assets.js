@@ -63,7 +63,18 @@ export const assets = {
     doc1,
     doc7,
     doc13,
-    doc11
+    doc11,
+    doc2,
+    doc3,
+    doc4, 
+    doc5,
+    doc6,
+    doc8,
+    doc9,
+    doc10,
+    doc12,
+    doc14,
+    doc15
 }
 
 export const specialityData = [

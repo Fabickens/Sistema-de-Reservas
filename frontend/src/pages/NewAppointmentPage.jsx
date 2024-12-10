@@ -5,6 +5,7 @@ const NewAppointmentPage = () => {
     const [doctores, setDoctores] = useState([]); // Lista de doctores
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Doctor seleccionado
     const [fecha, setFecha] = useState(''); // Fecha de la cita
+    const [hora, setHora] = useState(''); // Hora seleccionada
     const [tipo, setTipo] = useState('Presencial'); // Tipo de cita
     const [notas, setNotas] = useState(''); // Notas adicionales
 
@@ -25,19 +26,41 @@ const NewAppointmentPage = () => {
         fetchDoctores();
     }, []);
 
+    // Generar horarios cada 30 minutos entre 8:00 a.m. y 5:00 p.m.
+    const generateTimeSlots = () => {
+        const slots = [];
+        const start = new Date();
+        start.setHours(8, 0, 0); // 8:00 AM
+
+        const end = new Date();
+        end.setHours(17, 0, 0); // 5:00 PM
+
+        while (start < end) {
+            const hour = start.getHours();
+            const minutes = start.getMinutes();
+            const formattedTime = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            slots.push(formattedTime);
+            start.setMinutes(start.getMinutes() + 30); // Incrementar por 30 minutos
+        }
+        return slots;
+    };
+
+    const timeSlots = generateTimeSlots();
+
     // Manejar la reserva de citas
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!selectedDoctor || !fecha) {
-            setErrorMessage('Selecciona un doctor y una fecha válida.');
+        if (!selectedDoctor || !fecha || !hora) {
+            setErrorMessage('Selecciona un doctor, una fecha y un horario válido.');
             return;
         }
 
         try {
+            const fullDateTime = `${fecha}T${hora}:00`; // Combinar fecha y hora en formato ISO
             const response = await api.post('/citas', {
                 id_doctor: selectedDoctor,
-                fecha,
+                fecha: fullDateTime,
                 tipo,
                 notas,
             });
@@ -45,7 +68,7 @@ const NewAppointmentPage = () => {
             setErrorMessage('');
         } catch (error) {
             console.error('Error al reservar cita:', error.response?.data || error.message);
-            setErrorMessage('No se pudo reservar la cita. Inténtalo de nuevo.');
+            setErrorMessage('No se pudo reservar la cita. No hay cupos disponibles.');
         }
     };
 
@@ -93,14 +116,30 @@ const NewAppointmentPage = () => {
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-lg max-w-lg mx-auto">
                 {/* Fecha */}
                 <div className="mb-4">
-                    <label className="block text-lg font-semibold mb-2">Fecha y Hora</label>
+                    <label className="block text-lg font-semibold mb-2">Fecha</label>
                     <input
-                        type="datetime-local"
+                        type="date"
                         value={fecha}
                         onChange={(e) => setFecha(e.target.value)}
                         className="w-full p-3 border rounded"
                         required
                     />
+                </div>
+
+                {/* Hora */}
+                <div className="mb-4">
+                    <label className="block text-lg font-semibold mb-2">Hora</label>
+                    <select
+                        value={hora}
+                        onChange={(e) => setHora(e.target.value)}
+                        className="w-full p-3 border rounded"
+                        required
+                    >
+                        <option value="" disabled>Selecciona un horario</option>
+                        {timeSlots.map((slot) => (
+                            <option key={slot} value={slot}>{slot}</option>
+                        ))}
+                    </select>
                 </div>
 
                 {/* Tipo de cita */}
