@@ -4,6 +4,7 @@ const app = express();
 require('dotenv').config();
 
 
+
 // Importar las rutas para CRUD
 const userRoutes = require('./routes/userRoutes'); 
 const appointmentRoutes = require('./routes/appointmentRoutes');
@@ -22,6 +23,7 @@ app.use(cors({
 // Middleware para procesar datos JSON
 app.use(express.json());
 
+
 // Uso las rutas bajo el prefijo /api
 app.use('/api', userRoutes);
 app.use('/api', appointmentRoutes);
@@ -29,6 +31,7 @@ app.use('/api', notificationRoutes);
 app.use('/api', medicalHistoryRoutes);
 app.use('/api', doctorsRoutes);
 app.use('/api', adminRoutes);
+
 
 
 

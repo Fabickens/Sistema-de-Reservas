@@ -3,10 +3,11 @@ const router = express.Router();
 const db = require('../db'); // Conexión a la base de datos
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { authenticateToken, authorizeRole } = require('../middlewares/authMiddleware');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
-//Registrar un nuevo doctor
-router.post('/doctores/registrar', authenticateToken, authorizeRole(['administrador']), async (req, res) => {
+// Endpoint para registrar doctores con imagen
+router.post('/doctores/registrar', async (req, res) => {
     const { nombre, correo, contraseña, especialidad, experiencia, acerca, precio, direccion } = req.body;
 
     try {

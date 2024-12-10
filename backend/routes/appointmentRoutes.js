@@ -11,6 +11,28 @@ router.post('/citas', authenticateToken, async (req, res) => {
     console.log('Datos recibidos en /citas:', { id_paciente, fecha, tipo, id_doctor, notas });
 
     try {
+
+        const pacienteCitaSql = `
+            SELECT * FROM citas 
+            WHERE id_paciente = ? AND fecha = ?
+        `;
+        const [pacienteCita] = await db.query(pacienteCitaSql, [id_paciente, fecha]);
+
+        if (pacienteCita.length > 0) {
+            return res.status(400).json({ message: 'Ya tienes una cita programada para esta fecha y hora.' });
+        }
+
+        // Validar si el doctor ya tiene una cita a la misma hora
+        const doctorCitaSql = `
+            SELECT * FROM citas 
+            WHERE id_doctor = ? AND fecha = ?
+        `;
+        const [doctorCita] = await db.query(doctorCitaSql, [id_doctor, fecha]);
+
+        if (doctorCita.length > 0) {
+            return res.status(400).json({ message: 'El doctor ya tiene una cita programada para esta fecha y hora.' });
+        }
+
         const sql = `INSERT INTO citas (fecha, tipo, id_paciente, id_doctor, notas)
                      VALUES (?, ?, ?, ?, ?)`;
 
@@ -97,6 +119,25 @@ router.put('/citas/:id', authenticateToken, async (req, res) => {
             return res.status(403).json({ message: 'No tienes permiso para editar esta cita.' });
         }
 
+        // Validar que no haya conflictos para el paciente
+        const [conflictingPaciente] = await db.query(
+            `SELECT * FROM citas WHERE id_paciente = ? AND fecha = ? AND id != ?`,
+            [id_usuario, fecha, id]
+        );
+        if (conflictingPaciente.length > 0) {
+            return res.status(400).json({ message: 'Ya tienes una cita programada en esta fecha y hora.' });
+        }
+
+        // Validar que no haya conflictos para el doctor
+        const id_doctor = cita[0].id_doctor; // Obtener el ID del doctor de la cita existente
+        const [conflictingDoctor] = await db.query(
+            `SELECT * FROM citas WHERE id_doctor = ? AND fecha = ? AND id != ?`,
+            [id_doctor, fecha, id]
+        );
+        if (conflictingDoctor.length > 0) {
+            return res.status(400).json({ message: 'El doctor ya tiene una cita programada en esta fecha y hora.' });
+        }
+
         // Actualizar la cita
         const sql = `UPDATE citas SET fecha = ?, notas = ? WHERE id = ?`;
         const [result] = await db.query(sql, [fecha, notas, id]);
@@ -111,6 +152,7 @@ router.put('/citas/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Error al editar cita.', error });
     }
 });
+
 
 
 // Actualizar una cita por ID
