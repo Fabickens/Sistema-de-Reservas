@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+const { authenticateToken, authorizeRole } = require('../middlewares/authMiddleware');
 
 // Endpoint para registrar doctores con imagen
 router.post('/doctores/registrar', async (req, res) => {
@@ -36,8 +37,33 @@ router.get('/doctores', async (req, res) => {
     }
 });
 
+router.get('/doctores/perfil', authenticateToken, async (req, res) => {
+    const doctorId = req.user.id; // ID del doctor autenticado
+
+    try {
+        const sql = `
+            SELECT id, nombre, correo, especialidad, experiencia, acerca, precio, direccion
+            FROM doctores
+            WHERE id = ?
+        `;
+
+        const [doctor] = await db.query(sql, [doctorId]);
+
+        if (doctor.length === 0) {
+            return res.status(404).json({ message: 'Doctor no encontrado.' });
+        }
+
+        res.status(200).json(doctor[0]);
+    } catch (error) {
+        console.error('Error al obtener perfil del doctor:', error);
+        res.status(500).json({ message: 'Error al obtener perfil del doctor.', error });
+    }
+});
+
+
+
 //Obtener doctores por id
-router.get('/doctores/:id', async (req, res) => {
+router.get('/doctores/id/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -52,8 +78,43 @@ router.get('/doctores/:id', async (req, res) => {
     }
 });
 
+router.put('/doctores/perfil', authenticateToken, async (req, res) => {
+    const doctorId = req.user.id;
+    const { nombre, especialidad, experiencia, acerca, precio, direccion } = req.body;
+
+    try {
+        const sql = `
+            UPDATE doctores
+            SET nombre = ?, especialidad = ?, experiencia = ?, acerca = ?, precio = ?, direccion = ?
+            WHERE id = ?
+        `;
+
+        const [result] = await db.query(sql, [
+            nombre,
+            especialidad,
+            experiencia,
+            acerca,
+            precio,
+            direccion,
+            doctorId,
+        ]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Doctor no encontrado o no actualizado.' });
+        }
+
+        res.status(200).json({ message: 'Perfil actualizado exitosamente.' });
+    } catch (error) {
+        console.error('Error al actualizar perfil del doctor:', error);
+        res.status(500).json({ message: 'Error al actualizar perfil del doctor.', error });
+    }
+});
+
+
+
+
 //Editar doctores por id
-router.put('/doctores/:id', async (req, res) => {
+router.put('/doctores/id/:id', async (req, res) => {
     const { id } = req.params;
     const { nombre, imagen, experiencia, acerca, precio, direccion } = req.body;
 
@@ -97,6 +158,35 @@ router.get('/especialidades', async (req, res) => {
         res.status(500).json({ message: 'Error al obtener especialidades.', error });
     }
 });
+
+router.post('/doctores/login', async (req, res) => {
+    const { correo, contraseña } = req.body;
+
+    try {
+        const [result] = await db.query('SELECT * FROM doctores WHERE correo = ?', [correo]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Doctor no encontrado' });
+        }
+
+        const doctor = result[0];
+
+        const validPassword = await bcrypt.compare(contraseña, doctor.contraseña);
+        if (!validPassword) {
+            return res.status(400).json({ message: 'Contraseña incorrecta' });
+        }
+
+        // Generar token con datos de administrador
+        const token = jwt.sign({ id: doctor.id, nombre: doctor.nombre, rol: 'doctor' }, process.env.JWT_SECRET);
+
+        res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+    } catch (error) {
+        console.error('Error al iniciar sesión como doctor:', error);
+        res.status(500).json({ message: 'Error interno del servidor' });
+    }
+});
+
+
 
 
 module.exports = router;

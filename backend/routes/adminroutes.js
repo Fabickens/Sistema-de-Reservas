@@ -22,7 +22,7 @@ router.post('/administradores/login', async (req, res) => {
         }
 
         // Generar token con datos de administrador
-        const token = jwt.sign({ id: administrador.id, nombre: administrador.nombre }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: administrador.id, nombre: administrador.nombre, rol:'administrador' }, process.env.JWT_SECRET);
 
         res.status(200).json({ message: 'Inicio de sesión exitoso', token });
     } catch (error) {

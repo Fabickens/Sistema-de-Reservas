@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import api from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 
-function LoginAdminPage() {
+function LoginDoctorPage() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -12,7 +12,7 @@ function LoginAdminPage() {
         e.preventDefault();
 
         try {
-            const response = await api.post('/administradores/login', {
+            const response = await api.post('/doctores/login', {
                 correo: email,
                 contraseña: password,
             });
@@ -20,7 +20,7 @@ function LoginAdminPage() {
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token); // Guardar el token en localStorage
                 alert('Inicio de sesión exitoso');
-                navigate('/DoctorsManagement'); // Redirigir al dashboard o página principal
+                navigate('/DoctorAppointments'); // Redirigir al dashboard o página principal
             }
         } catch (error) {
             console.error('Error muy malo:', error.response ? error.response.data : error.message);
@@ -31,7 +31,7 @@ function LoginAdminPage() {
     return (
         <form onSubmit={handleSubmit} className="min-h-[80vh] flex items-center">
             <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
-            <p className='text-2xl font-semibold m-auto'><span className='text-teal-500'>Admini</span>strador</p>
+            <p className='text-2xl font-semibold m-auto'><span className='text-teal-500'>Doc</span>tores</p>
                 <div className="w-full">
                     <p>Correo</p>
                     <input
@@ -63,4 +63,4 @@ function LoginAdminPage() {
     );
 }
 
-export default LoginAdminPage;
+export default LoginDoctorPage;

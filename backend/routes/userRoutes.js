@@ -27,7 +27,7 @@ router.post('/usuarios/registrar', async (req, res) => {
 });
 
 // Obtener todos los usuarios
-router.get('/usuarios', authenticateToken, async (req, res) => {
+router.get('/usuarios', async (req, res) => {
     try {
         const [result] = await db.query('SELECT * FROM usuarios');
         res.status(200).json(result);

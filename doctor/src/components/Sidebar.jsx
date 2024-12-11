@@ -12,14 +12,13 @@ const Sidebar = () => {
 
     // Opciones del Sidebar
     const menuOptions = [
-        { label: 'Lista de Doctores', path: '/DoctorsManagement' },
-        { label: 'Lista de Usuarios', path: '/UsersManagement' },
-        { label: 'Registrar Doctores', path: '/RegisterDoctor' },
+        { label: 'Mis Citas', path: '/DoctorAppointments' },
+        { label: 'Perfil', path: '/DoctorProfile' },
     ];
 
     return (
         <div className="w-64 h-screen bg-slate-200 text-gray">
-            <h2 className="text-xl text-center font-bold p-4 bg-verde text-white px-10 py-2 ">Panel de Administración</h2>
+            <h2 className="text-xl text-center font-bold p-4 bg-verde text-white px-10 py-2 ">Panel de Doctores</h2>
             <ul className="p-4">
                 {menuOptions.map((option, index) => (
                     <li
