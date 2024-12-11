@@ -13,6 +13,7 @@ const Sidebar = () => {
     // Opciones del Sidebar
     const menuOptions = [
         { label: 'Lista de Doctores', path: '/DoctorsManagement' },
+        { label: 'Lista de Usuarios', path: '/UsersManagement' },
         { label: 'Registrar Doctores', path: '/RegisterDoctor' },
     ];
 

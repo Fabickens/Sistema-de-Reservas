@@ -5,6 +5,7 @@ import LoginAdminPage from './pages/Login';
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar';
 import RegisterDoctor from './pages/Admin/RegisterDoctor';
+import UsersManagement from './pages/Admin/UsersManagement';
 import ProtectedRoute2 from './components/ProtectedRoute';
 
 
@@ -24,6 +25,7 @@ const AdminApp = () => {
                             <Route path="/" element={<LoginAdminPage/>} />
                             <Route path="/DoctorsManagement" element={<ProtectedRoute2> <DoctorsManagement /></ProtectedRoute2>} />
                             <Route path="/RegisterDoctor" element={<ProtectedRoute2> <RegisterDoctor /> </ProtectedRoute2>} />
+                            <Route path="/UsersManagement" element={<ProtectedRoute2> <UsersManagement /> </ProtectedRoute2>} />
                         </Routes>
                     </div>
                 </div>

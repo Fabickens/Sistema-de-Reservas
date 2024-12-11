@@ -58,7 +58,6 @@ function LoginAdminPage() {
                 >
                     Iniciar Sesión
                 </button>
-                <p>¿Eres un doctor? <Link to='/DoctorLogin' className='text-primary underline cursor-pointer'>Ingresa aquí</Link></p>
             </div>
         </form>
     );
