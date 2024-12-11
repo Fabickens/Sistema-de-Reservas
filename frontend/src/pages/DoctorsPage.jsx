@@ -14,7 +14,6 @@ const DoctorCard = ({ doctor, onClick }) => (
         />
         <p className="text-lg font-bold text-gray-800">{doctor.nombre}</p>
         <p className="text-sm text-gray-600">{doctor.especialidad}</p>
-        <p className="text-sm text-gray-600">{doctor.direccion}</p>
         <p className="text-sm text-gray-600">${doctor.precio} por consulta</p>
     </div>
 );
