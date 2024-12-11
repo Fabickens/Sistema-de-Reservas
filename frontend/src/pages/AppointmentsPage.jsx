@@ -93,6 +93,16 @@ const AppointmentsPage = () => {
                             <p><strong>Fecha:</strong> {new Date(cita.fecha).toLocaleString()}</p>
                             <p><strong>Tipo:</strong> {cita.tipo}</p>
                             <p><strong>Notas:</strong> {cita.notas || 'Sin notas'}</p>
+                            <p> <strong>Link de reunión, solo si su cita es virtual:</strong>{' '}
+                                <a
+                                    href="https://meet.google.com/landing"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 underline"
+                                >
+                                    Unirse a la reunión
+                                </a>
+                            </p>
                             <div className="mt-4 flex gap-2">
                                 <button
                                     onClick={() => handleEditStart(cita)}
